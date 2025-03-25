@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Gradient Background */
+body {
+  @apply bg-gradient-to-br from-pink-500 via-red-400 to-yellow-300;
+  overflow: hidden;
+}
+
+/* Falling Sakura Effect */
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.sakura {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Sakura_falling.png/30px-Sakura_falling.png")
+    no-repeat center/contain;
+  animation: fall linear infinite;
+}
+
+@for $i from 1 through 30 {
+  .sakura:nth-child(#{$i}) {
+    left: random(100vw);
+    animation-duration: calc(5s + random(5s));
+    animation-delay: random(5s);
+  }
+}
