@@ -41,7 +41,7 @@ const Home1 = () => {
   return (
     <div className="flex h-screen">
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg"
+        className="md:hidden sticky top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg"
         onClick={() => setMenuOpen(!menuOpen)}
       >
         {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}

@@ -39,14 +39,15 @@ const Home = () => {
   return (
     <div className="flex h-screen">
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg"
+        className=" absolute md:hidden  top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg"
+        styles={{position:"absolute"}}
         onClick={() => setMenuOpen(!menuOpen)}
       >
         {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
       </button>
 
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-gray-900 p-5 transform transition-transform md:translate-x-0 ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`absolute left-0 top-0 h-full w-64 bg-gray-900 p-5 transform transition-transform md:translate-x-0 ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="text-white text-lg font-bold mb-6 text-center">Dịch Vụ</div>
         <nav>
