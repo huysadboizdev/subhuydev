@@ -50,24 +50,40 @@ export const getAllUser = async (req, res) => {
 const addService = async (req, res) => {
     try {
         const { platform, category, name, price, speed } = req.body;
+        const imageFile = req.file;
 
-        if (!platform || !category || !name || !price || !speed) {
-            return res.status(400).json({ error: "Thiếu dữ liệu đầu vào" });
+        if (!platform || !category || !name || !price || !speed || !imageFile) {
+            return res.json({ success: false, message: "Hãy Điền Đầy Đủ Thông Tin" });
         }
-        
+
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" });
+        const imageUrl = imageUpload.secure_url;
+
         const existingService = await Service.findOne({ platform, category, name });
         if (existingService) {
-            return res.status(400).json({ error: "Dịch vụ này đã có sẵn" });
+            return res.status(400).json({ success: false, message: "Dịch vụ này đã có sẵn" });
         }
 
-        const newService = new Service({ platform, category, name, price, speed });
+        const serviceData = {
+            platform,
+            category,
+            name,
+            price,
+            speed,
+            image: imageUrl
+        };
+
+        const newService = new Service(serviceData);
         await newService.save();
 
-        res.json({ message: "Dịch vụ đã được thêm thành công" });
+        res.json({ success: true, newService });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.log(error);
+        res.status(400).json({ success: false, message: error.message });
     }
 };
+
 
 // Lấy danh sách dịch vụ từ MongoDB
 const listService = async (req, res) => {
@@ -75,29 +91,19 @@ const listService = async (req, res) => {
         const services = await Service.find();
         res.json(services);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
 // Xóa dịch vụ trong MongoDB
-const removeService = async (req, res) => {
+const deleteService = async (req, res) => {
     try {
-        const { platform, category, name } = req.body;
-
-        if (!platform || !category || !name) {
-            return res.status(400).json({ error: "Thiếu dữ liệu đầu vào" });
-        }
-
-        const deletedService = await Service.findOneAndDelete({ platform, category, name });
-
-        if (deletedService) {
-            res.json({ message: "Dịch vụ được xóa" });
-        } else {
-            res.status(400).json({ error: "Không tìm thấy dịch vụ" });
-        }
+        const {serviceId} = req.body;
+        await Service.findByIdAndDelete(serviceId);
+        res.json({ success: true, message: "Xóa dịch vụ thành công" });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+        res.status(400).json({ success: false, message: error.message });
+    }  
+}
 
-export { addService, listService, removeService };
+export { addService, listService, deleteService };
