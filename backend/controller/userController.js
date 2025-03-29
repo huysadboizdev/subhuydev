@@ -190,3 +190,41 @@ export const updatePassword = async (req, res) => {
     }
 }
 
+export const getServices = async (req, res) => {
+    try {
+        const services = await Service.find();
+        res.json(services);
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+export const orderService = async (req, res) => {
+    try {
+        const { userId, serviceId } = req.body;
+
+        if (!userId || !serviceId) {
+            return res.status(400).json({ success: false, message: "Missing userId or serviceId." });
+        }
+
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+
+        const service = await Service.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({ success: false, message: "Service not found." });
+        }
+
+        const newOrder = new Order({ user: userId, service: serviceId });
+        await newOrder.save();
+
+        res.json({ success: true, message: "Service ordered successfully." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "An error occurred. Please try again." });
+    }
+};
+
+
