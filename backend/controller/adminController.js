@@ -1,10 +1,10 @@
 
 import Service from '../models/serviceModel.js'
 import userModel from '../models/userModel.js'
+import transactionModel from '../models/transactionModel.js'
 
 
-// api login 
-export const login = async (req, res) => {
+export const login_admin = async (req, res) => {
     try {
         const { email, password } = req.body
 
@@ -19,6 +19,9 @@ export const login = async (req, res) => {
         res.status(400).json({ success: false, message: error.message })
     }
 }
+
+
+
 //function manager user
 export const deleteUser = async (req, res) => {
     try {
@@ -46,54 +49,84 @@ export const getAllUser = async (req, res) => {
     }
 }
 
+
+
+export const login_user = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email });
+
+        if (!user) {
+            return res.json({ success: false, message: "Người dùng không tồn tại" });
+        }
+
+        if (user.isBlocked) {
+            return res.json({ success: false, message: "Tài khoản của bạn đã bị chặn" });
+        }
+
+        // Thực hiện xác thực mật khẩu (nếu có logic mật khẩu)
+        res.json({ success: true, user });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
 // function manager service
 const addService = async (req, res) => {
     try {
         const { platform, category, name, price, speed } = req.body;
-        const imageFile = req.file;
 
-        if (!platform || !category || !name || !price || !speed || !imageFile) {
+        if (!platform || !category || !name || !price || !speed) {
             return res.json({ success: false, message: "Hãy Điền Đầy Đủ Thông Tin" });
         }
 
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" });
-        const imageUrl = imageUpload.secure_url;
-
-        const existingService = await Service.findOne({ platform, category, name });
-        if (existingService) {
-            return res.status(400).json({ success: false, message: "Dịch vụ này đã có sẵn" });
-        }
-
-        const serviceData = {
-            platform,
-            category,
-            name,
-            price,
-            speed,
-            image: imageUrl
-        };
-
-        const newService = new Service(serviceData);
+        const newService = new Service({ platform, category, name, price, speed });
         await newService.save();
 
         res.json({ success: true, newService });
-
     } catch (error) {
-        console.log(error);
         res.status(400).json({ success: false, message: error.message });
     }
 };
+
+const editService = async (req, res) => {
+    try {
+        const { serviceId, platform, category, name, price, speed } = req.body;
+
+        if (!serviceId || !platform || !category || !name || !price || !speed) {
+            return res.json({ success: false, message: "Hãy điền đầy đủ thông tin" });
+        }
+
+        const updatedService = await Service.findByIdAndUpdate(
+            serviceId,
+            { platform, category, name, price, speed },
+            { new: true }
+        );
+
+        if (!updatedService) {
+            return res.status(404).json({ success: false, message: "Dịch vụ không tồn tại" });
+        }
+
+        res.json({ success: true, updatedService });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+
+
 
 
 // Lấy danh sách dịch vụ từ MongoDB
 const listService = async (req, res) => {
     try {
         const services = await Service.find();
-        res.json(services);
+        res.json({ success: true, services }); // Trả về có success để frontend xử lý dễ hơn
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+
 
 // Xóa dịch vụ trong MongoDB
 const deleteService = async (req, res) => {
@@ -106,4 +139,34 @@ const deleteService = async (req, res) => {
     }  
 }
 
-export { addService, listService, deleteService };
+export { addService, listService, deleteService, editService };
+
+// Admin duyệt nạp tiền
+export const approveDeposit = async (req, res) => {
+    try {
+        const { transactionId } = req.body;
+
+        const transaction = await transactionModel.findById(transactionId);
+        if (!transaction || transaction.status !== "pending") {
+            return res.status(400).json({ success: false, message: "Giao dịch không hợp lệ." });
+        }
+
+        const user = await userModel.findById(transaction.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Người dùng không tồn tại." });
+        }
+
+        // Cộng tiền vào tài khoản
+        user.deposit += transaction.amount;
+        await user.save();
+
+        // Cập nhật trạng thái giao dịch
+        transaction.status = "approved";
+        await transaction.save();
+
+        res.json({ success: true, message: "Nạp tiền thành công." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Lỗi hệ thống." });
+    }
+};
+
