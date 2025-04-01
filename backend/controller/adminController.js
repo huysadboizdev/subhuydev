@@ -1,7 +1,8 @@
 
 import Service from '../models/serviceModel.js'
 import userModel from '../models/userModel.js'
-import transactionModel from '../models/transactionModel.js'
+import transactionModel from '../models/transactionModel.js';
+
 
 
 export const login_admin = async (req, res) => {
@@ -141,32 +142,48 @@ const deleteService = async (req, res) => {
 
 export { addService, listService, deleteService, editService };
 
-// Admin duyệt nạp tiền
+
+// Admin chấp nhận yêu cầu nạp tiền
 export const approveDeposit = async (req, res) => {
     try {
         const { transactionId } = req.body;
 
         const transaction = await transactionModel.findById(transactionId);
-        if (!transaction || transaction.status !== "pending") {
-            return res.status(400).json({ success: false, message: "Giao dịch không hợp lệ." });
+        if (!transaction || transaction.status !== 'pending') {
+            return res.status(400).json({ success: false, message: 'Giao dịch không hợp lệ' });
         }
 
-        const user = await userModel.findById(transaction.userId);
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Người dùng không tồn tại." });
-        }
-
-        // Cộng tiền vào tài khoản
-        user.deposit += transaction.amount;
-        await user.save();
-
-        // Cập nhật trạng thái giao dịch
-        transaction.status = "approved";
+        transaction.status = 'approved';
         await transaction.save();
 
-        res.json({ success: true, message: "Nạp tiền thành công." });
+        await userModel.findByIdAndUpdate(transaction.userId, { $inc: { balance: transaction.amount } });
+
+        res.json({ success: true, message: 'Nạp tiền thành công' });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Lỗi hệ thống." });
+        res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
+
+// Admin từ chối yêu cầu nạp tiền
+export const rejectDeposit = async (req, res) => {
+    try {
+        const { transactionId } = req.body;
+
+        const transaction = await transactionModel.findById(transactionId);
+        if (!transaction || transaction.status !== 'pending') {
+            return res.status(400).json({ success: false, message: 'Giao dịch không hợp lệ' });
+        }
+
+        transaction.status = 'rejected';
+        await transaction.save();
+
+        res.json({ success: true, message: 'Giao dịch đã bị từ chối' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
+
+
+
 

@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     dob: { type: String, required: true },
-    deposit: { type: Number, default: 0 },
+    balance: { type: Number, default: 0 } 
 }, { minimize: false, timestamps: true })
 
 const userModel = mongoose.model('user', userSchema)

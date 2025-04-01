@@ -2,7 +2,8 @@ import validator from 'validator'
 import bcrypt from 'bcrypt'
 import userModel from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
-import depositModel from '../models/depositModel.js'
+import transactionModel from '../models/transactionModel.js';
+
 
 //import cloudinary from 'cloudinary'
 //api to register
@@ -230,34 +231,19 @@ export const orderService = async (req, res) => {
 };
 
 // Yêu cầu nạp tiền
-export const depositRequest = async (req, res) => {
+export const requestDeposit = async (req, res) => {
     try {
         const { userId, amount } = req.body;
 
         if (!userId || !amount || amount <= 0) {
-            return res.status(400).json({ success: false, message: "Số tiền không hợp lệ." });
+            return res.status(400).json({ success: false, message: 'Số tiền không hợp lệ' });
         }
 
-        const user = await userModel.findById(userId);
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Người dùng không tồn tại." });
-        }
+        const newTransaction = new transactionModel({ userId, amount });
+        await newTransaction.save();
 
-        // Tạo yêu cầu nạp tiền, lưu vào DB
-        const newDeposit = new depositModel({
-            userId,
-            amount,
-            status: "pending", // Chờ admin xác nhận
-        });
-
-        await newDeposit.save();
-        res.json({ success: true, message: "Yêu cầu nạp tiền đã được gửi." });
+        res.json({ success: true, message: 'Yêu cầu nạp tiền đã được gửi' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Lỗi hệ thống." });
+        res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
-
-
-
-
