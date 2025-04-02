@@ -22,7 +22,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:4000/api/user/register", formData);
+      const res = await axios.post(import.meta.env.VITE_BACKEND_URL+"/user/register", formData);
       setMessage(res.data.message);
       if (res.data.success) {
         alert("Đăng Ký thành công!");

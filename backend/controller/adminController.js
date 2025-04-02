@@ -114,10 +114,6 @@ const editService = async (req, res) => {
     }
 };
 
-
-
-
-
 // Lấy danh sách dịch vụ từ MongoDB
 const listService = async (req, res) => {
     try {

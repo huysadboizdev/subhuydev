@@ -14,7 +14,7 @@ const ManagerService = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/admin/list");
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL+"/admin/list");
       if (response.data.success) {
         setServices(response.data.services);
       }
@@ -26,7 +26,7 @@ const ManagerService = () => {
   const handleDeleteService = async (serviceId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) return;
     try {
-      const response = await axios.post("http://localhost:4000/api/admin/delete-service", { serviceId });
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL+"/admin/delete-service", { serviceId });
       if (response.data.success) {
         setServices((prev) => prev.filter((service) => service._id !== serviceId));
       }
@@ -38,7 +38,7 @@ const ManagerService = () => {
   const handleAddService = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:4000/api/admin/add-service", newService);
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL+"/admin/add-service", newService);
       if (response.data.success) {
         setServices((prev) => [...prev, response.data.newService]);
         setNewService({ platform: "", category: "", name: "", price: "", speed: "" });
@@ -58,7 +58,7 @@ const ManagerService = () => {
   const handleUpdateService = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:4000/api/admin/edit-service", { ...newService, serviceId: editService._id });
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL+"/admin/edit-service", { ...newService, serviceId: editService._id });
       if (response.data.success) {
         setServices((prev) =>
           prev.map((service) => (service._id === editService._id ? response.data.updatedService : service))

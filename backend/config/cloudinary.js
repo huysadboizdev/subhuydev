@@ -1,4 +1,5 @@
 import {v2 as cloudinary} from 'cloudinary';
+import dotnev from 'dotenv';
 
 
 const connectCloudinary = async () => {
@@ -8,3 +9,5 @@ const connectCloudinary = async () => {
         api_secret: process.env.CLOUDINARY_API_SECRET,
     });
 }
+
+export default connectCloudinary

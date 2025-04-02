@@ -10,6 +10,7 @@ import Login_admin from "./pages/Login_admin";
 import Home_admin from "./pages/Home_admin";
 import Manager_user from "./pages/manager_user";
 import ManagerService from "./pages/Manager_service";
+import Profile from "./pages/Profile";
 
 
 
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/admin/home_admin" element={<Home_admin />} />
         <Route path="/admin/manager_user" element={<Manager_user />} />
         <Route path="/admin/services" element={<ManagerService />} />
+        <Route path="/profile" element={<Profile />} />
         {/* Add more routes as needed */}
         
 

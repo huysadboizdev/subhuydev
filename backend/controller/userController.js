@@ -3,9 +3,10 @@ import bcrypt from 'bcrypt'
 import userModel from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
 import transactionModel from '../models/transactionModel.js';
+import cloudinary from '../config/cloudinary.js'
 
 
-//import cloudinary from 'cloudinary'
+
 //api to register
 export const registerUser = async (req, res) => {
     try {
@@ -73,91 +74,116 @@ export const registerUser = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body
+        const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.json({ success: fasle, message: 'missing email or password' })
+            return res.json({ success: false, message: 'Missing email or password' });
         }
 
-        const user = await userModel.findOne({ email })
+        const user = await userModel.findOne({ email });
 
         if (!user) {
-            return res.json({ success: false, message: 'email not found' })
+            return res.json({ success: false, message: 'Email not found' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.json({ success: false, message: 'wrong password' })
+            return res.json({ success: false, message: 'Wrong password' });
         }
-        
 
-        const accesstoken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET)
+        const accesstoken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "7d" });
 
-        return res.json({ success: true, message: 'login success', accesstoken })
-    }
-    catch (error) {
-        console.log(error)
-        res.status(400).json({ success: false, message: 'Some thing wrong' })
-    }
-}
-
-
-// api profile
-export const profile = async (req, res) => {
-    try {
-        const { userId } = req.body
-
-        console.log(userId)
-        const userData = await userModel.findById(userId).select('-password')
-
-        res.json({ success: true, userData })
-
+        return res.json({
+            success: true,
+            message: 'Login successful',
+            accesstoken,
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                dob: user.dob,
+                balance: user.balance,
+                image: user.image ? `data:${user.image.contentType};base64,${user.image.data.toString('base64')}` : null
+            }
+        });
     } catch (error) {
-        console.log(error)
-        res.status(400).json({ success: false, message: error.message })
+        console.log(error);
+        res.status(400).json({ success: false, message: 'Something went wrong' });
     }
-}
+};
 
-// update profile
-export const updateProfile = async (req, res) => {
-    try{
-        const {userId, username, phone, dob} = req.body
-        const image = req.file
-        console.log(userId)
-        const user = await userModel.findById(userId)
+// Cập nhật profile (lưu ảnh lên Cloudinary)
+    // export const updateProfile = async (req, res) => {
+    //     try {
+    //         const { userId, username, phone, dob } = req.body;
+    //         const image = req.file;
+    
+    //         const user = await userModel.findById(userId);
+    //         if (!user) {
+    //             return res.json({ success: false, message: 'User not found' });
+    //         }
+    
+    //         let updateData = {};
+    //         if (username) updateData.username = username;
+    //         if (phone) updateData.phone = phone;
+    //         if (dob) updateData.dob = dob;
+    
+    //         if (image) {
+    //             // Upload ảnh lên Cloudinary
+    //             const uploadedImage = await cloudinary.uploader.upload(image.path, { folder: 'user_profiles' });
+    //             updateData.image = uploadedImage.secure_url; // Chỉ lưu URL
+    //         }
+    
+    //         const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, { new: true });
+    //         res.json({ success: true, message: 'Profile updated', user: updatedUser });
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ success: false, message: 'An error occurred' });
+    //     }
+    // };
 
-        if(!user) {
-            return res.json({success: false, message: 'user not found'})
+
+    export const updateProfile = async (req, res) => {
+        try {
+            const { userId, username, phone, dob } = req.body;
+            const image = req.file;
+    
+            console.log(userId);
+            const user = await userModel.findById(userId);
+    
+            if (!user) {
+                return res.json({ success: false, message: "User not found" });
+            }
+    
+            if (username) {
+                await userModel.findByIdAndUpdate(userId, { username });
+            }
+    
+            if (phone) {
+                await userModel.findByIdAndUpdate(userId, { phone });
+            }
+    
+            if (dob) {
+                await userModel.findByIdAndUpdate(userId, { dob });
+            }
+    
+            if (image) {
+                // Upload image to Cloudinary
+                const imageUpload = await cloudinary.uploader.upload(image.path, { resource_type: "image", folder: "user_profiles" });
+                const imageUrl = imageUpload.secure_url;
+    
+                await userModel.findByIdAndUpdate(userId, { image: imageUrl });
+            }
+    
+            res.json({ success: true, message: "Profile updated" });
+        } catch (error) {
+            console.log(error);
+            res.status(400).json({ success: false, message: error.message });
         }
-
-        if(username) {
-            await userModel.findByIdAndUpdate(userId, {username})
-        }
-
-        if(phone) {
-            await userModel.findByIdAndUpdate(userId, {phone})
-        }
-        
-        if(dob) {
-            await userModel.findByIdAndUpdate(userId, {dob})
-        }
-
-        if (image) {
-            // upload image to cloudinary
-            const imageUpload = await cloudinary.uploader.upload(image.path, { resource_type: 'image' })
-            const imageUrl = imageUpload.secure_url
-
-            await userModel.findByIdAndUpdate(userId, { image: imageUrl })
-        }
-        res.json({ success: true, messgae: 'profile updated' })
-    }
-    catch (error) {
-        console.log(error)
-        res.status(400).json({ success: false, message: error.message })
-    }
-}
-
+    };
+    
 // update password
 export const updatePassword = async (req, res) => {
     try {

@@ -14,7 +14,7 @@ const HomeAdmin = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/admin/all-user");
+      const response = await axios.get( import.meta.env.VITE_BACKEND_URL+"/admin/all-user");
       setUsers(response.data.users);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách người dùng:", error);
@@ -24,7 +24,7 @@ const HomeAdmin = () => {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) return;
     try {
-      await axios.post("http://localhost:4000/api/admin/delete-user", { userId });
+      await axios.post(import.meta.env.VITE_BACKEND_URL+"/admin/delete-user", { userId });
       setUsers(users.filter((user) => user._id !== userId));
     } catch (error) {
       console.error("Lỗi khi xóa người dùng:", error);

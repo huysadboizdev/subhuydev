@@ -13,7 +13,7 @@ const Login_admin = () => {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:4000/api/admin/login", {
+      const res = await axios.post(import.meta.env.VITE_BACKEND_URL+"/admin/login", {
         email,
         password,
       });

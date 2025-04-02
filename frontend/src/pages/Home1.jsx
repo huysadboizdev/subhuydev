@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { FiShoppingCart, FiList, FiCreditCard, FiUser, FiCode, FiLogIn, FiClock, FiDollarSign, FiMenu, FiX, FiLogOut } from "react-icons/fi";
+import { FiShoppingCart, FiList, FiCreditCard, FiUser, FiCode,  FiClock, FiDollarSign, FiMenu, FiX, FiLogOut, FiInfo } from "react-icons/fi";
 
 const Home1 = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,12 +20,13 @@ const Home1 = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/service");
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL+"/service");
       setServiceData(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
     }
   };
+  
 
   const categories = selectedPlatform ? serviceData[selectedPlatform]?.categories || [] : [];
   const services = selectedCategory ? serviceData[selectedPlatform]?.services[selectedCategory] || [] : [];
@@ -72,7 +73,9 @@ const Home1 = () => {
               <FiUser /> Cài Đặt
             </li>
             <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-              <FiCode /> API Đối Tác
+            <Link to="/profile" className="flex items-center gap-3 w-full">
+              <FiInfo /> Thông Tin
+            </Link>
             </li>
             <li className="flex items-center gap-3 p-3 text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600">
                 <Link to="/login" className="flex items-center gap-3 w-full">
