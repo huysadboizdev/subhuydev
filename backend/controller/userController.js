@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import userModel from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
 import transactionModel from '../models/transactionModel.js';
-import cloudinary from '../config/cloudinary.js'
+import {v2 as cloudinary} from 'cloudinary';
 
 
 
@@ -171,7 +171,7 @@ export const login = async (req, res) => {
     
             if (image) {
                 // Upload image to Cloudinary
-                const imageUpload = await cloudinary.uploader.upload(image.path, { resource_type: "image", folder: "user_profiles" });
+                const imageUpload = await cloudinary.uploader.upload(image.path, { resource_type: "image" });
                 const imageUrl = imageUpload.secure_url;
     
                 await userModel.findByIdAndUpdate(userId, { image: imageUrl });
