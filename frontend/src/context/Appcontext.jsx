@@ -7,6 +7,7 @@ export const AppContext = createContext();
 const AppContextProvider = (props) => {
   const [token, setToken] = useState(localStorage.getItem("access_token") || "");
   const [userData, setUserData] = useState(null);
+  
 
   const loadUserProfileData = async () => {
     if (!token) return setUserData(null);
@@ -26,12 +27,40 @@ const AppContextProvider = (props) => {
     }
   };
 
+  const requestDeposit = async (amount) => {
+    if (!userData || !userData._id) {
+      toast.error("Bạn chưa đăng nhập");
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + "/api/user/deposit",
+        {
+          userId: userData._id,
+          amount,
+        },
+        {
+          headers: { token },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Lỗi khi gửi yêu cầu nạp tiền");
+    }
+  };
+
   useEffect(() => {
     loadUserProfileData();
   }, [token]);
 
   return (
-    <AppContext.Provider value={{ token, setToken, userData, setUserData, loadUserProfileData }}>
+    <AppContext.Provider value={{ token, setToken, userData, setUserData, loadUserProfileData, requestDeposit }}>
       {props.children}
     </AppContext.Provider>
   );

@@ -201,34 +201,40 @@ export const getServices = async (req, res) => {
     }
 };
 
+// API đặt hàng dịch vụ
 export const orderService = async (req, res) => {
     try {
-        const { userId, serviceId } = req.body;
+        const { serviceId } = req.body;
 
-        if (!userId || !serviceId) {
-            return res.status(400).json({ success: false, message: "Missing userId or serviceId." });
+        // Lấy thông tin người dùng từ token
+        const userId = req.user.id;
+
+        if (!serviceId) {
+            return res.status(400).json({ success: false, message: 'Thiếu serviceId' });
         }
 
+        // Kiểm tra người dùng có tồn tại không
         const user = await userModel.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, message: "User not found." });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
         }
 
+        // Kiểm tra dịch vụ có tồn tại không
         const service = await Service.findById(serviceId);
         if (!service) {
-            return res.status(404).json({ success: false, message: "Service not found." });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy dịch vụ' });
         }
 
+        // Tạo đơn hàng mới
         const newOrder = new Order({ user: userId, service: serviceId });
         await newOrder.save();
 
-        res.json({ success: true, message: "Service ordered successfully." });
+        res.json({ success: true, message: 'Đặt dịch vụ thành công' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: "An error occurred. Please try again." });
+        res.status(500).json({ success: false, message: 'Đã xảy ra lỗi. Vui lòng thử lại.' });
     }
 };
-
 // Yêu cầu nạp tiền
 export const requestDeposit = async (req, res) => {
     try {

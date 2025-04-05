@@ -11,7 +11,7 @@ const Home1 = () => {
   const [selectedService, setSelectedService] = useState("");
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState(0);
-  const [activeTab, setActiveTab] = useState("Đặt hàng");
+  const [activeTab, setActiveTab] = useState("Trang Chủ");
 
   useEffect(() => {
     fetchServices();
@@ -21,7 +21,7 @@ const Home1 = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/service");
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/user/services");
       setServiceData(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
@@ -56,38 +56,96 @@ const Home1 = () => {
           <ul className="space-y-3">
             <li
               className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
-                  ${activeTab === "Đặt hàng" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-                  onClick={() => setActiveTab("Đặt hàng")}
+                ${activeTab === "Trang chủ" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Trang chủ")}
             >
-              <FiShoppingCart /> Đặt hàng
-            </li>
-
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-              <FiList /> Xem Dịch Vụ
-            </li>
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-              <FiClock /> Lịch Sử Đơn Hàng
-            </li>
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-              <FiCreditCard /> Nạp tiền (KM 10%)
-            </li>
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-              <FiDollarSign /> Dòng Tiền
-            </li>
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-              <FiUser /> Cài Đặt
-            </li>
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
-            <Link to="/profile" className="flex items-center gap-3 w-full">
-                <FiInfo /> Thông Tin 
+              <Link to="/home" className="flex items-center gap-3 w-full">
+                <FiCode /> Trang Chủ
               </Link>
             </li>
-            <li className="flex items-center gap-3 p-3 text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600">
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+                  ${activeTab === "Đặt hàng" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Đặt hàng")}
+            >
+              <Link to="/order" className="flex items-center gap-3 w-full">
+                <FiShoppingCart /> Đặt hàng
+              </Link>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+                  ${activeTab === "Xem Dịch Vụ" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Xem Dịch Vụ")}
+            >
+              <Link to="/services" className="flex items-center gap-3 w-full">
+                <FiList /> Xem Dịch Vụ
+              </Link>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+                ${activeTab === "Lịch Sử Đơn Hàng" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Lịch Sử Đơn Hàng")}
+            >
+              <Link to="/order-history" className="flex items-center gap-3 w-full">
+                <FiClock /> Lịch Sử Đơn Hàng
+              </Link>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+                ${activeTab === "Nạp tiền" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => {
+                setActiveTab("Nạp tiền");
+                navigate("/transaction");
+              }}
+            >
+              <Link to="/transaction" className="flex items-center gap-3 w-full">
+                <FiCreditCard /> Nạp tiền (KM 10%)
+              </Link>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+              ${activeTab === "Dòng Tiền" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Dòng Tiền")}
+            >
+              <Link to="/cash-flow" className="flex items-center gap-3 w-full">
+                <FiDollarSign /> Dòng Tiền
+              </Link>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+  ${activeTab === "Cài Đặt" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Cài Đặt")}
+            >
+              <Link to="/settings" className="flex items-center gap-3 w-full">
+                <FiUser /> Cài Đặt
+              </Link>
+            </li>
+
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+  ${activeTab === "Thông Tin" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+              onClick={() => setActiveTab("Thông Tin")}
+            >
+              <Link to="/profile" className="flex items-center gap-3 w-full">
+                <FiInfo /> Thông Tin
+              </Link>
+            </li>
+
+            <li
+              className="flex items-center gap-3 p-3 text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600 cursor-pointer"
+            >
               <Link to="/login" className="flex items-center gap-3 w-full">
                 <FiLogOut /> Đăng Xuất
               </Link>
-
             </li>
+
+
           </ul>
         </nav>
       </aside>
@@ -122,7 +180,7 @@ const Home1 = () => {
             </p>
 
           </div>
-          <div className="p-16 bg-gray-800 text-white rounded-lg shadow-md">
+          {/* <div className="p-16 bg-gray-800 text-white rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-5 text-left">Tạo Đơn Hàng Mới</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <select className="p-4 bg-gray-700 text-white rounded-xl w-full text-lg" onChange={(e) => setSelectedPlatform(e.target.value)}>
@@ -164,7 +222,7 @@ const Home1 = () => {
             </button>
 
 
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

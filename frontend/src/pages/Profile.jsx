@@ -31,43 +31,87 @@ const Profile = () => {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white shadow rounded-xl mt-10">
-      <h1 className="text-2xl font-bold mb-4">Thông tin cá nhân</h1>
+    <div className="h-screen flex justify-center items-center">
+      <div className="max-w-3xl w-full p-8 bg-white shadow rounded-xl">
+        <h1 className="text-2xl font-bold mb-4">Thông tin cá nhân</h1>
 
-      {!editing ? (
-        <>
-          <div className="space-y-2 mb-4">
-            <div><strong>Username:</strong> {user.username}</div>
-            <div><strong>Email:</strong> {user.email}</div>
-            <div><strong>Số điện thoại:</strong> {user.phone}</div>
-            <div><strong>Ngày sinh:</strong> {user.dob}</div>
-            <div><strong>Số dư:</strong> {user.balance} VNĐ</div>
-            {user.image && (
+        {!editing ? (
+          <>
+            <div className="space-y-4 mb-4">
+              {user.image && (
+                <div className="flex flex-col items-center">
+                  <label className="font-semibold text-gray-700 mb-2">Ảnh đại diện:</label>
+                  <img src={user.image} alt="avatar" className="w-32 h-32 rounded-full" />
+                </div>
+              )}
+             
               <div>
-                <strong>Ảnh đại diện:</strong><br />
-                <img src={user.image} alt="avatar" className="w-32 h-32 rounded-full mt-2" />
+                <label className="block text-gray-700 font-semibold mb-1">Tài khoản:</label>
+                <input
+                  type="text"
+                  value={user.username}
+                  disabled
+                  className="w-full px-4 py-2 bg-gray-100 rounded border border-gray-300"
+                />
               </div>
-            )}
-          </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Email:</label>
+                <input
+                  type="text"
+                  value={user.email}
+                  disabled
+                  className="w-full px-4 py-2 bg-gray-100 rounded border border-gray-300"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Số điện thoại:</label>
+                <input
+                  type="text"
+                  value={user.phone}
+                  disabled
+                  className="w-full px-4 py-2 bg-gray-100 rounded border border-gray-300"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Ngày sinh:</label>
+                <input
+                  type="text"
+                  value={user.dob}
+                  disabled
+                  className="w-full px-4 py-2 bg-gray-100 rounded border border-gray-300"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Số dư:</label>
+                <input
+                  type="text"
+                  value={Number(user.balance).toLocaleString('vi-VN')}
+                  disabled
+                  className="w-full px-4 py-2 bg-gray-100 rounded border border-gray-300"
+                />
+              </div>
+            </div>
 
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            onClick={() => setEditing(true)}
-          >
-            Chỉnh sửa thông tin
-          </button>
-        </>
-      ) : (
-        <>
-          <EditProfile user={user} />
-          <button
-            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            onClick={() => setEditing(false)}
-          >
-            Cập nhật thông tin
-          </button>
-        </>
-      )}
+
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={() => setEditing(true)}
+            >
+              Chỉnh sửa thông tin
+            </button>
+          </>
+        ) : (
+          <>
+            <EditProfile user={user} />
+            <button
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              onClick={() => setEditing(false)}
+            >
+              Cập nhật thông tin
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

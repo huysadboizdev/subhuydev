@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const EditProfile = ({ user }) => {
   const [username, setUsername] = useState(user.username || '');
@@ -7,6 +8,8 @@ const EditProfile = ({ user }) => {
   const [dob, setDob] = useState(user.dob || '');
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
