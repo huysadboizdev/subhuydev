@@ -1,6 +1,4 @@
 import jwt from 'jsonwebtoken'
-
-
 // user authentication middleware
 const authUser = async (req, res, next) => {
     try {

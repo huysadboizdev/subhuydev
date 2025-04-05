@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { FiShoppingCart, FiList, FiCreditCard, FiUser, FiCode,  FiClock, FiDollarSign, FiMenu, FiX, FiLogOut, FiInfo } from "react-icons/fi";
+import { FiShoppingCart, FiList, FiCreditCard, FiUser, FiCode, FiLogIn, FiClock, FiDollarSign, FiMenu, FiX, FiLogOut, FiInfo } from "react-icons/fi";
 
 const Home1 = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,22 +11,22 @@ const Home1 = () => {
   const [selectedService, setSelectedService] = useState("");
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState(0);
+  const [activeTab, setActiveTab] = useState("Đặt hàng");
 
   useEffect(() => {
     fetchServices();
   }, []);
 
-  
+
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get(import.meta.env.VITE_BACKEND_URL+"/service");
+      const response = await axios.get("http://localhost:4000/api/service");
       setServiceData(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
     }
   };
-  
 
   const categories = selectedPlatform ? serviceData[selectedPlatform]?.categories || [] : [];
   const services = selectedCategory ? serviceData[selectedPlatform]?.services[selectedCategory] || [] : [];
@@ -54,9 +54,14 @@ const Home1 = () => {
         <div className="text-white text-lg font-bold mb-6 text-center">Dịch Vụ</div>
         <nav>
           <ul className="space-y-3">
-            <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
+            <li
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
+                  ${activeTab === "Đặt hàng" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                  onClick={() => setActiveTab("Đặt hàng")}
+            >
               <FiShoppingCart /> Đặt hàng
             </li>
+
             <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
               <FiList /> Xem Dịch Vụ
             </li>
@@ -74,14 +79,14 @@ const Home1 = () => {
             </li>
             <li className="flex items-center gap-3 p-3 text-gray-300 hover:bg-gray-700 rounded-lg hover:text-white">
             <Link to="/profile" className="flex items-center gap-3 w-full">
-              <FiInfo /> Thông Tin
-            </Link>
+                <FiInfo /> Thông Tin 
+              </Link>
             </li>
             <li className="flex items-center gap-3 p-3 text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600">
-                <Link to="/login" className="flex items-center gap-3 w-full">
+              <Link to="/login" className="flex items-center gap-3 w-full">
                 <FiLogOut /> Đăng Xuất
-                </Link>
-                
+              </Link>
+
             </li>
           </ul>
         </nav>
@@ -89,11 +94,11 @@ const Home1 = () => {
       <div className={`p-0 w-full transition-all ${menuOpen ? "ml-0" : "md:ml-64"}`}>
         <div className="mt-20 w-full max-w-10xl mx-auto">
           <div className="p-5 bg-gray-900 text-white rounded-lg shadow-md mb-9">
-          <img src="URL_AVATAR_CUA_BAN" alt="Avatar" className="w-10 h-10 rounded-full" />
-            <p>Chào Mừng <span className="text-red-500 font-bold">{localStorage.getItem("username")}</span> ✅ Quay Trở Lại !</p> 
+            <img src="URL_AVATAR_CUA_BAN" alt="Avatar" className="w-10 h-10 rounded-full" />
+            <p>Chào Mừng <span className="text-red-500 font-bold">{localStorage.getItem("username")}</span> ✅ Quay Trở Lại !</p>
             <p>Đang KM 20% Giá Trị Nạp Tiền, Ae tranh thủ húp nhé !</p>
-            <p>Cần Hỗ Trợ Thì 
-            <button
+            <p>Cần Hỗ Trợ Thì
+              <button
                 className="p-2 bg-yellow-400 text-black font-bold rounded-lg ml-2"
                 onClick={() => window.open("https://zalo.me/84763076124", "_blank")}
               >
@@ -106,15 +111,15 @@ const Home1 = () => {
               >
                 Liên hệ Admin Qua TELEGRAM
               </button>
-              </p>
-              <p>Nhóm Zalo Trao Đổi - Thông Báo
-                <button
-                  className="p-2 bg-green-500 text-white font-bold rounded-lg ml-2"
-                  onClick={() => window.open("https://zalo.me/g/sfejxv466", "_blank")}
-                >
-                  Click Vào Nhóm Zalo
-                </button>
-              </p>
+            </p>
+            <p>Nhóm Zalo Trao Đổi - Thông Báo
+              <button
+                className="p-2 bg-green-500 text-white font-bold rounded-lg ml-2"
+                onClick={() => window.open("https://zalo.me/g/sfejxv466", "_blank")}
+              >
+                Click Vào Nhóm Zalo
+              </button>
+            </p>
 
           </div>
           <div className="p-16 bg-gray-800 text-white rounded-lg shadow-md">
@@ -140,7 +145,7 @@ const Home1 = () => {
               </select>
               <div className="col-span-full">
                 <label className="block text-lg font-bold mb-2">Liên kết cần tăng</label>
-              <input className="p-4 bg-gray-700 text-white rounded-xl w-full text-lg" placeholder="Nhập liên kết" />
+                <input className="p-4 bg-gray-700 text-white rounded-xl w-full text-lg" placeholder="Nhập liên kết" />
               </div>
               <input className="p-4 bg-gray-700 text-white rounded-xl w-full text-lg" placeholder="Số lượng cần tăng" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
               <input className="p-4 bg-gray-700 text-white rounded-xl w-full text-lg" placeholder="Giá tiền" type="text" value={price * (quantity ? parseInt(quantity) : 0) + "đ"} readOnly />

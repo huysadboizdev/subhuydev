@@ -1,40 +1,72 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import EditProfile from '../components/Editprofile.jsx';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    fetchUserInfo();
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(import.meta.env.VITE_BACKEND_URL + '/user/get-user', {
+          headers: { token }
+        });
 
-  const fetchUserInfo = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+        if (res.data.success) {
+          setUser(res.data.user);
+        } else {
+          alert(res.data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Lỗi khi lấy thông tin người dùng');
+      }
+    };
 
-      const response = await axios.get(import.meta.env.VITE_BACKEND_URL + "/user/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    fetchProfile();
+  }, [editing]);
 
-      setUser(response.data.userData);
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin người dùng:", error);
-    }
-  };
-
-  if (!user) return <p>Đang tải thông tin...</p>;
+  if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="p-5 bg-gray-800 text-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Thông Tin Người Dùng</h2>
-      <p><strong>Tên:</strong> {user.username}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Số Điện Thoại:</strong> {user.phone}</p>
-      <p><strong>Ngày Sinh:</strong> {user.dob}</p>
-      <p><strong>Số Dư:</strong> {user.balance}đ</p>
-      {user.image && (
-        <img src={user.image} alt="Avatar" className="w-20 h-20 rounded-full mt-4" />
+    <div className="max-w-md mx-auto p-4 bg-white shadow rounded-xl mt-10">
+      <h1 className="text-2xl font-bold mb-4">Thông tin cá nhân</h1>
+
+      {!editing ? (
+        <>
+          <div className="space-y-2 mb-4">
+            <div><strong>Username:</strong> {user.username}</div>
+            <div><strong>Email:</strong> {user.email}</div>
+            <div><strong>Số điện thoại:</strong> {user.phone}</div>
+            <div><strong>Ngày sinh:</strong> {user.dob}</div>
+            <div><strong>Số dư:</strong> {user.balance} VNĐ</div>
+            {user.image && (
+              <div>
+                <strong>Ảnh đại diện:</strong><br />
+                <img src={user.image} alt="avatar" className="w-32 h-32 rounded-full mt-2" />
+              </div>
+            )}
+          </div>
+
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            onClick={() => setEditing(true)}
+          >
+            Chỉnh sửa thông tin
+          </button>
+        </>
+      ) : (
+        <>
+          <EditProfile user={user} />
+          <button
+            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={() => setEditing(false)}
+          >
+            Cập nhật thông tin
+          </button>
+        </>
       )}
     </div>
   );
