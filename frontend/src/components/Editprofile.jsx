@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const EditProfile = ({ user }) => {
   const [username, setUsername] = useState(user.username || '');
+  
   const [phone, setPhone] = useState(user.phone || '');
   const [dob, setDob] = useState(user.dob || '');
   const [image, setImage] = useState(null);

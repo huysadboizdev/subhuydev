@@ -2,6 +2,7 @@
 import Service from '../models/serviceModel.js'
 import userModel from '../models/userModel.js'
 import transactionModel from '../models/transactionModel.js';
+import Order from '../models/orderModel.js'
 
 
 
@@ -140,6 +141,8 @@ export { addService, listService, deleteService, editService };
 
 
 // Admin chấp nhận yêu cầu nạp tiền
+
+
 export const approveDeposit = async (req, res) => {
     try {
         const { transactionId } = req.body;
@@ -149,16 +152,22 @@ export const approveDeposit = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Giao dịch không hợp lệ' });
         }
 
+        // Cập nhật trạng thái giao dịch
         transaction.status = 'approved';
         await transaction.save();
 
-        await userModel.findByIdAndUpdate(transaction.userId, { $inc: { balance: transaction.amount } });
+        // Cộng tiền vào tài khoản user
+        await userModel.findByIdAndUpdate(
+            transaction.userId,
+            { $inc: { balance: transaction.amount } }
+        );
 
         res.json({ success: true, message: 'Nạp tiền thành công' });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Lỗi server' });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
+
 
 // Admin từ chối yêu cầu nạp tiền
 export const rejectDeposit = async (req, res) => {
@@ -179,6 +188,44 @@ export const rejectDeposit = async (req, res) => {
     }
 };
 
+
+// Lấy danh sách yêu cầu nạp tiền (status: pending)
+export const getTransactions = async (req, res) => {
+    try {
+        const transactions = await transactionModel.find({ status: 'pending' }).populate({
+            path: 'userId',
+            model: 'user',
+            select: 'username email'
+        });
+
+        res.json({
+            success: true,
+            message: 'Danh sách yêu cầu nạp tiền',
+            transactions
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+            error: error.message
+        });
+    }
+};
+
+export const getAllOrders = async (req, res) => {
+    try {
+      // Fetch all orders from the database
+      const orders = await Order.find()
+        .populate('userId', 'username email') // Populate user details (optional)
+        .populate('serviceId', 'platform categories services') // Populate service details (optional)
+        .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+  
+      res.json({ success: true, orders });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Đã xảy ra lỗi. Vui lòng thử lại.' });
+    }
+  };
 
 
 

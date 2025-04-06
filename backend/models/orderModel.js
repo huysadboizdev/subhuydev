@@ -1,26 +1,37 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+import serviceModel from "./serviceModel.js"; // Import serviceModel
 
 const orderSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users',
+    ref: "User",  // Giả sử bạn có một model "User" để lưu thông tin người dùng
     required: true
   },
-  serviceId: {
+  service: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'services',
+    ref: "server",  // Tham chiếu đến serviceModel
+    required: true
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  totalPrice: {
+    type: Number,
     required: true
   },
   status: {
     type: String,
-    enum: ['Pending', 'Processing', 'Completed', 'Cancelled'],
-    default: 'Pending'
+    enum: ["Pending", "In Progress", "Completed", "Cancelled"],  // Trạng thái của đơn hàng
+    default: "Pending"
   },
-  createdAt: {
+  orderDate: {
     type: Date,
     default: Date.now
   }
 });
 
-const Order = mongoose.model('orders', orderSchema);
-export default Order;
+const orderModel = mongoose.model("Order", orderSchema);
+
+export default orderModel;

@@ -1,73 +1,70 @@
-// src/pages/user/Transaction.jsx
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { AppContext } from '../../context/AppContext';
 
 const Transaction = () => {
-  const { user } = useContext(AppContext);
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
-  const [transactions, setTransactions] = useState([]);
-  
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const res = await axios.get(`/api/transactions/${user._id}`);
-        setTransactions(res.data.transactions);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    if (user) fetchTransactions();
-  }, [user]);
+  const [loading, setLoading] = useState(false);
 
   const handleDeposit = async (e) => {
     e.preventDefault();
+
+    if (!amount || amount <= 0) {
+      setMessage('Số tiền không hợp lệ');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setMessage('Bạn chưa đăng nhập');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await axios.post('/api/users/request-deposit', {
-        userId: user._id,
-        amount: Number(amount),
-      });
-      setMessage(res.data.message);
-      setAmount('');
-    } catch (err) {
-      console.error(err);
+      const response = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + '/user/deposit',
+        { amount },
+        {
+          headers: {
+            token: token, // phù hợp với backend đang dùng req.headers.token
+          },
+        }
+      );
+
+      setMessage(response.data.message || 'Đã gửi yêu cầu');
+    } catch (error) {
+      setMessage('Lỗi máy chủ');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-6 mt-10">
-      <h1 className="text-2xl font-bold text-center">Yêu cầu nạp tiền</h1>
+    <div className="max-w-md mx-auto p-4 border rounded-lg shadow">
+      <h2 className="text-xl font-semibold mb-4">Nạp tiền</h2>
       <form onSubmit={handleDeposit} className="space-y-4">
-        <div>
-          <label className="block font-medium text-gray-700 mb-1">Số tiền:</label>
-          <input
-            type="number"
-            className="w-full border border-gray-300 rounded px-4 py-2"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-          Gửi yêu cầu
+        <input
+          type="number"
+          min="1"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="Nhập số tiền"
+          className="w-full border px-3 py-2 rounded-md"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+        >
+          {loading ? 'Đang xử lý...' : 'Gửi yêu cầu nạp tiền'}
         </button>
-        {message && <p className="text-green-600 font-medium text-center">{message}</p>}
       </form>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Lịch sử giao dịch</h2>
-        <div className="space-y-2">
-          {transactions.map((t) => (
-            <div key={t._id} className="border p-3 rounded shadow bg-white">
-              <p><strong>Số tiền:</strong> {t.amount.toLocaleString('vi-VN')} đ</p>
-              <p><strong>Trạng thái:</strong> {t.status}</p>
-              <p><strong>Ngày:</strong> {new Date(t.createdAt).toLocaleString('vi-VN')}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {message && (
+        <p className={`mt-4 text-sm ${message.includes('lỗi') ? 'text-red-500' : 'text-green-500'}`}>
+          {message}
+        </p>
+      )}
     </div>
   );
 };

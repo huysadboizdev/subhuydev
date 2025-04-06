@@ -11,6 +11,9 @@ import Home_admin from "./pages/Home_admin";
 import Manager_user from "./pages/manager_user";
 import ManagerService from "./pages/Manager_service";
 import Profile from "./pages/Profile";
+import Transaction from "./pages/Transaction";
+import ManagerCard from "./pages/Manager_card";
+import ServicesList from "./components/List_service";
 
 
 
@@ -28,7 +31,10 @@ const App = () => {
         <Route path="/admin/home_admin" element={<Home_admin />} />
         <Route path="/admin/manager_user" element={<Manager_user />} />
         <Route path="/admin/services" element={<ManagerService />} />
+        <Route path="/admin/manager_card" element={<ManagerCard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/transaction" element={<Transaction />} />
+        <Route path="/services" element={<ServicesList />} />
         {/* Add more routes as needed */}
         
 

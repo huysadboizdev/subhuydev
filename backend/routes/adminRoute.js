@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { addService, listService, getAllUser, deleteUser,login_admin, deleteService, editService, approveDeposit  } from '../controller/adminController.js';
+import { addService, listService, getAllUser, deleteUser,login_admin, deleteService, editService, approveDeposit, rejectDeposit, getTransactions, getAllOrders  } from '../controller/adminController.js';
 
 
 const adminRouter = express.Router();
@@ -13,6 +13,9 @@ adminRouter.get('/all-user', getAllUser);
 adminRouter.post('/delete-user', deleteUser);
 adminRouter.post('/login', login_admin);
 adminRouter.post('/approve', approveDeposit);
+adminRouter.post('/reject', rejectDeposit);
+adminRouter.get('/transactions', getTransactions);
+adminRouter.get('/orders', getAllOrders);
 
 
 

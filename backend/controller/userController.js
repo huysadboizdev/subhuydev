@@ -4,6 +4,8 @@ import userModel from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
 import transactionModel from '../models/transactionModel.js';
 import { v2 as cloudinary } from 'cloudinary';
+import serviceModel from '../models/serviceModel.js'
+import orderModel from '../models/orderModel.js'
 
 
 
@@ -192,55 +194,63 @@ export const updatePassword = async (req, res) => {
     }
 }
 
-export const getServices = async (req, res) => {
+// Lấy tất cả dịch vụ
+export const getAllServices = async (req, res) => {
     try {
-        const services = await Service.find();
-        res.json(services);
+      const services = await serviceModel.find({});
+      res.status(200).json({
+        success: true,
+        services,
+      });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+      console.error("Lỗi khi lấy danh sách dịch vụ:", error);
+      res.status(500).json({
+        success: false,
+        message: "Không thể lấy danh sách dịch vụ",
+      });
     }
+  };
+
+export const createOrder = async (req, res) => {
+  try {
+    const { userId, serviceId, quantity } = req.body;
+
+    // Kiểm tra xem dịch vụ có tồn tại không
+    const service = await serviceModel.findById(serviceId);
+    if (!service) {
+      return res.status(400).json({ message: "Dịch vụ không tồn tại" });
+    }
+
+    // Tính tổng giá trị đơn hàng
+    const totalPrice = service.price * quantity;
+
+    // Tạo đơn hàng mới
+    const newOrder = new orderModel({
+      userId,
+      service: serviceId,
+      quantity,
+      totalPrice,
+      status: "Pending",
+    });
+
+    // Lưu đơn hàng vào cơ sở dữ liệu
+    await newOrder.save();
+
+    // Trả về kết quả
+    res.status(201).json({ message: "Đơn hàng đã được tạo thành công", order: newOrder });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi khi tạo đơn hàng", error });
+  }
 };
 
-// API đặt hàng dịch vụ
-export const orderService = async (req, res) => {
-    try {
-        const { serviceId } = req.body;
-
-        // Lấy thông tin người dùng từ token
-        const userId = req.user.id;
-
-        if (!serviceId) {
-            return res.status(400).json({ success: false, message: 'Thiếu serviceId' });
-        }
-
-        // Kiểm tra người dùng có tồn tại không
-        const user = await userModel.findById(userId);
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
-        }
-
-        // Kiểm tra dịch vụ có tồn tại không
-        const service = await Service.findById(serviceId);
-        if (!service) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy dịch vụ' });
-        }
-
-        // Tạo đơn hàng mới
-        const newOrder = new Order({ user: userId, service: serviceId });
-        await newOrder.save();
-
-        res.json({ success: true, message: 'Đặt dịch vụ thành công' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Đã xảy ra lỗi. Vui lòng thử lại.' });
-    }
-};
-// Yêu cầu nạp tiền
+// Yêu cầu nạp tiền 
 export const requestDeposit = async (req, res) => {
     try {
-        const { userId, amount } = req.body;
+        const userId = req.body.userId;
+        const { amount } = req.body;
 
-        if (!userId || !amount || amount <= 0) {
+        if (!amount || amount <= 0) {
             return res.status(400).json({ success: false, message: 'Số tiền không hợp lệ' });
         }
 
@@ -249,6 +259,7 @@ export const requestDeposit = async (req, res) => {
 
         res.json({ success: true, message: 'Yêu cầu nạp tiền đã được gửi' });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Lỗi server' });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
+
