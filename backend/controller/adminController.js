@@ -2,7 +2,7 @@
 import Service from '../models/serviceModel.js'
 import userModel from '../models/userModel.js'
 import transactionModel from '../models/transactionModel.js';
-import Order from '../models/orderModel.js'
+import orderModel from '../models/orderModel.js'
 
 
 
@@ -212,20 +212,53 @@ export const getTransactions = async (req, res) => {
     }
 };
 
-export const getAllOrders = async (req, res) => {
-    try {
-      // Fetch all orders from the database
-      const orders = await Order.find()
-        .populate('userId', 'username email') // Populate user details (optional)
-        .populate('serviceId', 'platform categories services') // Populate service details (optional)
-        .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+export const handleAdminOrders = async (req, res) => {
+    const { action, orderId, status } = req.body;
   
-      res.json({ success: true, orders });
+    try {
+      // Lấy tất cả đơn hàng
+      if (action === "getAllOrders") {
+        const orders = await orderModel
+          .find()
+          .populate("service")
+          .sort({ orderDate: -1 });
+  
+        return res.status(200).json({ success: true, orders });
+      }
+  
+      // Thay đổi trạng thái đơn hàng
+      if (action === "updateOrderStatus") {
+        const order = await orderModel.findById(orderId);
+        if (!order) {
+          return res.status(400).json({ success: false, message: "Đơn hàng không tồn tại" });
+        }
+  
+        order.status = status;
+        await order.save();
+  
+        return res.status(200).json({ success: true, message: "Trạng thái đơn hàng đã được cập nhật", order });
+      }
+  
+      // Xóa đơn hàng
+      if (action === "deleteOrder") {
+        const order = await orderModel.findById(orderId);
+        if (!order) {
+          return res.status(400).json({ success: false, message: "Đơn hàng không tồn tại" });
+        }
+  
+        await order.deleteOne();
+        return res.status(200).json({ success: true, message: "Đơn hàng đã được xóa" });
+      }
+  
+      // Nếu action không hợp lệ
+      return res.status(400).json({ success: false, message: "Hành động không hợp lệ" });
+  
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: 'Đã xảy ra lỗi. Vui lòng thử lại.' });
+      console.error("Lỗi:", error);
+      return res.status(500).json({ success: false, message: "Lỗi xử lý", error });
     }
   };
+  
 
 
 

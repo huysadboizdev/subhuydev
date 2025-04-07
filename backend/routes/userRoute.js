@@ -1,5 +1,5 @@
 import express from 'express'
-import {login, registerUser, requestDeposit, updateProfile, getUser, getAllServices, createOrder } from '../controller/userController.js'
+import {login, registerUser, requestDeposit, updateProfile, getUser, handleUserService } from '../controller/userController.js'
 import multer from 'multer'
 import authUser from '../middlewares/authUser.js'
 import Order from '../models/orderModel.js'
@@ -15,9 +15,10 @@ userRouter.post('/deposit', authUser, requestDeposit)
 // userRouter.post('/update-profile', upload.single('image'), updateProfile);
 userRouter.put('/update-profile', authUser, upload.single('image'), updateProfile);
 userRouter.get('/get-user', authUser, getUser)
-userRouter.get('/services', getAllServices)
+userRouter.post('/order', authUser, handleUserService)
+// userRouter.get('/services', getAllServices)
+// userRouter.post('/order', authUser, createOrder)
 
-userRouter.post('/order', authUser, createOrder)
 
 
 

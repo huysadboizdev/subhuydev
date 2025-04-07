@@ -39,26 +39,6 @@ const Home1 = () => {
 
             <li
               className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
-                  ${activeTab === "Xem Dịch Vụ" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-              onClick={() => setActiveTab("Xem Dịch Vụ")}
-            >
-              <Link to="/services" className="flex items-center gap-3 w-full">
-                <FiList /> Xem Dịch Vụ
-              </Link>
-            </li>
-
-            <li
-              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
-                ${activeTab === "Lịch Sử Đơn Hàng" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-              onClick={() => setActiveTab("Lịch Sử Đơn Hàng")}
-            >
-              <Link to="/order-history" className="flex items-center gap-3 w-full">
-                <FiClock /> Lịch Sử Đơn Hàng
-              </Link>
-            </li>
-
-            <li
-              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer 
   ${activeTab === "Thông Tin" ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
               onClick={() => setActiveTab("Thông Tin")}
             >

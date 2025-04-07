@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Transaction from "./pages/Transaction";
 import ManagerCard from "./pages/Manager_card";
 import ServicesList from "./components/List_service";
+import ManagerOrder from "./pages/Manager_order";
 
 
 
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/admin/manager_user" element={<Manager_user />} />
         <Route path="/admin/services" element={<ManagerService />} />
         <Route path="/admin/manager_card" element={<ManagerCard />} />
+        <Route path="/admin/manager_order" element={<ManagerOrder />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/transaction" element={<Transaction />} />
         <Route path="/services" element={<ServicesList />} />
